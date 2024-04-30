@@ -1,7 +1,7 @@
 const express = require("express")
-const { MongoClient } = require("mongodb")
 
 const store = require('./model/store')
+const socket = require('./socket/socket')
 const authMiddleware = require('./middlewares/authMiddleware')
 
 require("dotenv").config()
@@ -9,13 +9,23 @@ require("dotenv").config()
 const app = express()
 const port = process.env.PORT || 3000
 
+app.use(express.json())
 
 async function run() {
-  const client = new MongoClient(process.env.MONGO_URI)
+  const serverAuth = await fetch(process.env.SERVER_ADDR + "/auth", {
+    method: "POST",
+    headers: {
+      "Authorization": process.env.API_KEY
+    }
+  })
 
-  await client.connect()
-
-  store.driver = client
+  if (!serverAuth.ok) {
+    const statusText = await serverAuth.text()
+    console.log(`[API ERROR] ${statusText}`)
+    return
+  }
+  const socketPort = await serverAuth.json()
+  socket.startSocket(socketPort.port)
 
   app.listen(port, () => console.log(`[INFO] Server is running on port ${port}`))
 }
