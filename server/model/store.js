@@ -4,6 +4,10 @@ function addRequestToQueue(request) {
   return
 }
 
+function addNewService(token, service) {
+
+}
+
 async function checkClient(auth_token) {
   const clientIfExists = this.clients.get(auth_token)
   if (clientIfExists) {
@@ -16,7 +20,7 @@ async function checkClient(auth_token) {
 
   try {
     auth_token = encodeURIComponent(auth_token)
-    const client = this.driver.collection("authorities")
+    const client = await this.driver.collection("authorities")
       .findOne({ auth_token: auth_token }, {
         projection: { _id: 0, auth_token: 1 }
       })

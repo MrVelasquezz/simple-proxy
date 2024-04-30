@@ -60,6 +60,7 @@ module.exports = async function (req, res, next) {
         res.status(200).send("Service was registered successfully!")
         break
     }
+    socket.socket.emit("new_service", { services: [1, 2, 3] })
   } catch (e) {
     next(e)
   }
